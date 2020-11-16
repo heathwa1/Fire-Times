@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- insert Mapbox GL library links here -->
+
+<script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
+
+
+		<style>
+		#map {height: 95vh;}
+		</style>
+	</head>
+
+	<body>
+		<!-- create div for the map here -->
+		<div id='map'></div>
+
+		<!-- JS code for the map goes here -->
+		<script>
+			//copy your access token here
+			 mapboxgl.accessToken = 'pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw'; //'yourAccessTokenHere';
+
+			var map = new mapboxgl.Map({
+			  container:'map', // HTML container id
+			  style: 'mapbox://styles/mapbox/streets-v11',  // style URL
+			  center:[-122.4733, 47.255], // starting position as [lng, lat]
+			  zoom: 10
+				// starting zoom
+			});
+
+
+// filters for classifying earthquakes into five categories based on magnitude
+var time1 =['to-string', ['<', ['get', 'RespTime'], '00:02:00']];
+var time2 = ['to-string',['all', ['>=', ['get', 'RespTime'], '00:02:00'], ['<', ['get', 'RespTime'], '00:04:00']]];
+var time3 = ['to-string',['all', ['>=', ['get', 'RespTime'], '00:04:00'], ['<', ['get', 'RespTime'], '00:06:00']]];
+var time4 = ['to-string',['all', ['>=', ['get', 'RespTime'], '00:06:00'], ['<', ['get', 'RespTime'], '00:08:00']]];
+var time5 = ['to-string',['>=', ['get', 'RespTime'], '00:08:00']];
+
+// colors to use for the categories
+var colors = ['#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c'];
+
+
+
+//Add GeoJSON layer
+//on map load, run function to load the geojson
+			map.on('load', function(){
+				//add a source layer for earthquakes"
+
+			map.addSource('FireTable', {
+							"type": "geojson",
+							"data": "FireTable_ShaperCon.json"
+
+					});
+
+					//add the earthquakes to the map
+					// map.addLayer({
+					// 	'id':'fireTime',
+					// 	'geometry-type':'point',
+					// 	'type':'circle',
+					// 	'source':'FireTable',
+						// 'properties':[RespTime.split(':'),[(+a[0])*60*60+(+a[1])*60+(+a[2])],[/60]
+
+						// 'paint':{
+						// 	'circle-color':[
+								map.addLayer({
+									'id': 'fireTime',
+									'type': 'circle',
+									'source': 'FireTable',
+									'paint': {
+										'circle-color': [
+											'case',
+												time1,
+												colors[0],
+												time2,
+												colors[1],
+												time3,
+												colors[2],
+												time4,
+												colors[3],
+												colors[4]
+											]
+								// ['filter'],
+								// ['to-number',['get','RespTime']],
+								// 'green',000200,
+								// 'yellow',000400,
+								// 'orange',000600,
+								// 'red',000800,
+								// '#ccc'
+
+
+						// 	'match',
+						// ['get', ['RespTime',[h.mm.ss]],
+						// 		'000000','blue',
+						// 		'000200','green',
+						// 		'000400','yellow',
+						// 		'000600','orange',
+						// 		'000800','red',
+						// 		'#ccc'
+					},
+					});
+
+					});
+
+
+
+
+
+			map.on('click', 'fireTime', function (e) {
+			new mapboxgl.Popup()
+			.setLngLat(e.lngLat)
+			.setHTML("Date: <b>" +e.features[0].properties.RespTime + "</b>")
+			.addTo(map);
+			});
+
+			map.on('mouseenter', 'fireTime', function () {
+map.getCanvas().style.cursor = 'pointer';
+});
+//
+// // Change it back to a pointer when it leaves.
+				map.on('mouseleave', 'fireTime', function () {
+map.getCanvas().style.cursor = 'pointer';
+});
+
+		</script>
+	</body>
+</html>
