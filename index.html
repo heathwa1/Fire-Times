@@ -45,30 +45,45 @@ var colors = ['#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c'];
 //Add GeoJSON layer
 //on map load, run function to load the geojson
 			map.on('load', function(){
-				
+
 			map.addSource('FireTable', {
 					"type": "geojson",
 					"data": "FireTable_ShaperCon.json"
 
 					});
+			// map.addSource("districts",{
+			// 	"type":"geojson",
+			// 	"data":"districts.geojson"
+			// });
+			// map.addLayer({
+			// 	'id':'hoods',
+			// 	'type':'fill',
+			// 	'geometry-type':'Polygon',
+			// 	'source':'districts',
+			// 	'paint':{
+			// 		'fill-color':[
+			// 			'match',['get','NAME'],
+			// 			'red','CENTRAL',
+			// 			'orange','EASTSIDE',
+			// 			'yellow','NEW TACOMA',
+			// 			'green','NORTH EAST',
+			// 			'blue','NORTH END',
+			// 			'purple','SOUTH END',
+			// 			'grey','SOUTH TACOMA',
+			// 			'white','WEST END',
+			// 			'#ccc'
+			// 		]
+			// 	}
 
-					//add the earthquakes to the map
-					// map.addLayer({
-					// 	'id':'fireTime',
-					// 	'geometry-type':'point',
-					// 	'type':'circle',
-					// 	'source':'FireTable',
-						// 'properties':[RespTime.split(':'),[(+a[0])*60*60+(+a[1])*60+(+a[2])],[/60]
 
-						// 'paint':{
-						// 	'circle-color':[
+
 			map.addLayer({
 				'id': 'fireTime',
 				'type': 'circle',
 				'source': 'FireTable',
 				'paint': {
 					'circle-color': [
-					'case',
+					'match',
 					time1,
 					colors[0],
 					time2,
@@ -77,30 +92,16 @@ var colors = ['#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c'];
 					colors[2],
 					time4,
 					colors[3],
+					time5,
 					colors[4]
 					]
-					// ['filter'],
-					// ['to-number',['get','RespTime']],
-					// 'green',000200,
-					// 'yellow',000400,
-					// 'orange',000600,
-					// 'red',000800,
-					// '#ccc'
+				},
 
+					'filter': ['==', '$type', 'Point']
+			});
+		});
 
-					// 	'match',
-					// ['get', ['RespTime',[h.mm.ss]],
-					// 		'000000','blue',
-					// 		'000200','green',
-					// 		'000400','yellow',
-					// 		'000600','orange',
-					// 		'000800','red',
-					// 		'#ccc'
-					},
-					});
-
-					});
-
+	console.log(JSONObjget(properties.RespTime));
 
 
 
