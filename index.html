@@ -5,7 +5,7 @@
 
 <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
-
+<link href ='https://cdn.jsdelivr.net/npm/luxon@1.25.0/build/global/luxon.min.js'/>
 
 		<style>
 		#map {height: 95vh;}
@@ -31,80 +31,82 @@
 
 
 // filters for classifying earthquakes into five categories based on magnitude
-var time1 =['to-string', ['<', ['get', 'RespTime'], '00:02:00']];
-var time2 = ['to-string',['all', ['>=', ['get', 'RespTime'], '00:02:00'], ['<', ['get', 'RespTime'], '00:04:00']]];
-var time3 = ['to-string',['all', ['>=', ['get', 'RespTime'], '00:04:00'], ['<', ['get', 'RespTime'], '00:06:00']]];
-var time4 = ['to-string',['all', ['>=', ['get', 'RespTime'], '00:06:00'], ['<', ['get', 'RespTime'], '00:08:00']]];
-var time5 = ['to-string',['>=', ['get', 'RespTime'], '00:08:00']];
+// var dur= Duration.fromObject(properties.RespTime)
+// dur.shiftTo('minutes', 'seconds').toObject();
+var time1 = ['<', ['get', 'RespTime'], '00:02:00'];
+var time2 = ['all', ['>=', ['get', 'RespTime'], '00:02:00'], ['<', ['get', 'RespTime'], '00:04:00']];
+var time3 = ['all', ['>=', ['get', 'RespTime'], '00:04:00'], ['<', ['get', 'RespTime'], '00:06:00']];
+var time4 = ['all', ['>=', ['get', 'RespTime'], '00:06:00'], ['<', ['get', 'RespTime'], '00:08:00']];
+var time5 = ['>=', ['get', 'RespTime'], '00:08:00'];
 
 // colors to use for the categories
 var colors = ['#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c'];
 
 
 
-//Add GeoJSON layer
-//on map load, run function to load the geojson
+// Add GeoJSON layer
+// on map load, run function to load the geojson
 			map.on('load', function(){
 
 			map.addSource('FireTable', {
 					"type": "geojson",
-					"data": "FireTable_ShaperCon.json"
+					"data": "FireTable_ShaperCon.json",
+					"generateId":true
 
-					});
-			// map.addSource("districts",{
-			// 	"type":"geojson",
-			// 	"data":"districts.geojson"
-			// });
-			// map.addLayer({
-			// 	'id':'hoods',
-			// 	'type':'fill',
-			// 	'geometry-type':'Polygon',
-			// 	'source':'districts',
-			// 	'paint':{
-			// 		'fill-color':[
-			// 			'match',['get','NAME'],
-			// 			'red','CENTRAL',
-			// 			'orange','EASTSIDE',
-			// 			'yellow','NEW TACOMA',
-			// 			'green','NORTH EAST',
-			// 			'blue','NORTH END',
-			// 			'purple','SOUTH END',
-			// 			'grey','SOUTH TACOMA',
-			// 			'white','WEST END',
-			// 			'#ccc'
-			// 		]
-			// 	}
+					 });
+			console.log(typeof "RespTime");
 
+			map.addSource("districts",{
+				"type":"geojson",
+				"data":"districts.geojson"
 
-
-			map.addLayer({
-				'id': 'fireTime',
-				'type': 'circle',
-				'source': 'FireTable',
-				'paint': {
-					'circle-color': [
-					'match',
-					time1,
-					colors[0],
-					time2,
-					colors[1],
-					time3,
-					colors[2],
-					time4,
-					colors[3],
-					time5,
-					colors[4]
-					]
-				},
-
-					'filter': ['==', '$type', 'Point']
 			});
-		});
 
-	console.log(JSONObjget(properties.RespTime));
+			// var dur= Duration.fromObject(properties.RespTime)
+			// dur.shiftTo('minutes', 'seconds').toObject();
+			map.addLayer({
+				'id':'hoods',
+				'type':'fill',
+				'geometry-type':'Polygon',
+				'source':'districts',
+				'paint':{
+					'fill-color':{
+						'type':'categorical',
+						'property':'NAME',
+						'stops':[
+						['CENTRAL','red'],
+						['EASTSIDE','orange'],
+						['NEW TACOMA','yellow'],
+						['NORTH EAST','green'],
+						['NORTH END','blue'],
+						['SOUTH END','purple'],
+						['SOUTH TACOMA','grey'],
+						['WEST END','pink']
 
+					]
+				}
 
-
+		// 	map.addLayer({
+		// 		'id': 'fireTime',
+		// 		'type': 'circle',
+		// 		'source': 'FireTable',
+		// 		'paint': {
+		// 			'circle-color': [
+		// 			'match',
+		// 			time1,
+		// 			colors[0],
+		// 			time2,
+		// 			colors[1],
+		// 			time3,
+		// 			colors[2],
+		// 			time4,
+		// 			colors[3],
+		// 			time5,
+		// 			colors[4]
+		// 			]
+		 		},
+		 	});
+		 });
 
 			map.on('click', 'fireTime', function (e) {
 			new mapboxgl.Popup()
