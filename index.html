@@ -3,127 +3,150 @@
 	<head>
 		<!-- insert Mapbox GL library links here -->
 
-<script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
-<link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
-<link href ='https://cdn.jsdelivr.net/npm/luxon@1.25.0/build/global/luxon.min.js'/>
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+<script src ="https://cdn.jsdelivr.net/npm/luxon@1.25.0/build/global/luxon.min.js"/>
+// <script src="luxon.js"></script>
+
 
 		<style>
-		#map {height: 95vh;}
+		#map {height: 80vh;}
 		</style>
 	</head>
 
 	<body>
 		<!-- create div for the map here -->
-		<div id='map'></div>
+		<div id="map"></div>
+			<div id="output"</div>
+
+
 
 		<!-- JS code for the map goes here -->
 		<script>
 			//copy your access token here
-			 mapboxgl.accessToken = 'pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw'; //'yourAccessTokenHere';
+
+
+			 var DateTime=luxon.DateTime;
+ 		var endTime=  JSON.stringify(feature.property.FirstUnitOnscene)
+// 			var startTime=new Date("CallReceived");
+// 			if (endTime < startTime) {
+//     		endTime.setDate(endTime.getDate() + 1);
+// }
+// 			 var diff = endTime - startTime;
+			// var time = diff;
+			// var mm = Math.floor(time / 1000 / 60);
+			// 		time -= mm * 1000 * 60;
+			// var ss = Math.floor(time / 1000);
+			// 		time -= ss * 1000;
+			// var time=JSONstringify.DateTime.(endTime minus(startTime))
+document.getElementById("output").innerHTML=endTime
+
+
+
+
+			 mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw"; //"yourAccessTokenHere";
 
 			var map = new mapboxgl.Map({
-			  container:'map', // HTML container id
-			  style: 'mapbox://styles/mapbox/streets-v11',  // style URL
+			  container:"map", // HTML container id
+			  style: "mapbox://styles/mapbox/streets-v11",  // style URL
 			  center:[-122.4733, 47.255], // starting position as [lng, lat]
 			  zoom: 10
 				// starting zoom
 			});
 
+// filters for classifying time duration into five categories based on magnitude
 
-// filters for classifying earthquakes into five categories based on magnitude
-// var dur= Duration.fromObject(properties.RespTime)
-// dur.shiftTo('minutes', 'seconds').toObject();
-var time1 = ['<', ['get', 'RespTime'], '00:02:00'];
-var time2 = ['all', ['>=', ['get', 'RespTime'], '00:02:00'], ['<', ['get', 'RespTime'], '00:04:00']];
-var time3 = ['all', ['>=', ['get', 'RespTime'], '00:04:00'], ['<', ['get', 'RespTime'], '00:06:00']];
-var time4 = ['all', ['>=', ['get', 'RespTime'], '00:06:00'], ['<', ['get', 'RespTime'], '00:08:00']];
-var time5 = ['>=', ['get', 'RespTime'], '00:08:00'];
+var time1 = ["<", ["get", "time"], "00:02:00"];
+var time2 = ["all", [">=", ["get", "time"], "00:02:00"], ["<", ["get", "time"], "00:04:00"]];
+var time3 = ["all", [">=", ["get", "time"], "00:04:00"], ["<", ["get", "time"], "00:06:00"]];
+var time4 = ["all", [">=", ["get", "time"], "00:06:00"], ["<", ["get", "time"], "00:08:00"]];
+var time5 = [">=", ["get", "RespTime"], "00:08:00"];
 
 // colors to use for the categories
-var colors = ['#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c'];
-
+var colors = ["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c"];
 
 
 // Add GeoJSON layer
 // on map load, run function to load the geojson
-			map.on('load', function(){
+			map.on("load", function(){
 
-			map.addSource('FireTable', {
-					"type": "geojson",
-					"data": "FireTable_ShaperCon.json",
-					"generateId":true
 
-					 });
-			console.log(typeof "RespTime");
 
 			map.addSource("districts",{
 				"type":"geojson",
 				"data":"districts.geojson"
 
 			});
-
-			// var dur= Duration.fromObject(properties.RespTime)
-			// dur.shiftTo('minutes', 'seconds').toObject();
+			 // var dur= Duration.fromObject(properties.RespTime)
+			 // dur.shiftTo("minutes", "seconds").toObject();
 			map.addLayer({
-				'id':'hoods',
-				'type':'fill',
-				'geometry-type':'Polygon',
-				'source':'districts',
-				'paint':{
-					'fill-color':{
-						'type':'categorical',
-						'property':'NAME',
-						'stops':[
-						['CENTRAL','red'],
-						['EASTSIDE','orange'],
-						['NEW TACOMA','yellow'],
-						['NORTH EAST','green'],
-						['NORTH END','blue'],
-						['SOUTH END','purple'],
-						['SOUTH TACOMA','grey'],
-						['WEST END','pink']
-
+				"id":"hoods",
+				"type":"fill",
+				"geometry-type":"Polygon",
+				"source":"districts",
+				"paint":{
+					"fill-color":{
+						"type":"categorical",
+						"property":"NAME",
+						"stops":[
+						["CENTRAL","red"],
+						["EASTSIDE","orange"],
+						["NEW TACOMA","yellow"],
+						["NORTH EAST","green"],
+						["NORTH END","blue"],
+						["SOUTH END","purple"],
+						["SOUTH TACOMA","grey"],
+						["WEST END","pink"]
 					]
 				}
+			}
+			});
+			map.addSource("FireTable", {
+						"type": "geojson",
+						"data": "FireTable_ShaperCon.json",
+						"generateId":true
+						 });
 
-		// 	map.addLayer({
-		// 		'id': 'fireTime',
-		// 		'type': 'circle',
-		// 		'source': 'FireTable',
-		// 		'paint': {
-		// 			'circle-color': [
-		// 			'match',
-		// 			time1,
-		// 			colors[0],
-		// 			time2,
-		// 			colors[1],
-		// 			time3,
-		// 			colors[2],
-		// 			time4,
-		// 			colors[3],
-		// 			time5,
-		// 			colors[4]
-		// 			]
-		 		},
+			map.addLayer({
+				"id": "fireTime",
+				"type": "circle",
+				"source": "FireTable",
+				"paint": {
+					"circle-color": [
+					"match",
+					"time1",
+					"colors"[0],
+					"time2",
+					"colors"[1],
+					"time3",
+					"colors"[2],
+					"time4",
+					"colors"[3],
+					"time5",
+					"colors"[4]
+					]
+		 		}
 		 	});
-		 });
+		});
 
-			map.on('click', 'fireTime', function (e) {
+
+			map.on("click", "fireTime", function (e) {
 			new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
 			.setHTML("Date: <b>" +e.features[0].properties.RespTime + "</b>")
 			.addTo(map);
 			});
 
-			map.on('mouseenter', 'fireTime', function () {
-map.getCanvas().style.cursor = 'pointer';
+			map.on("mouseenter", "fireTime", function () {
+map.getCanvas().style.cursor = "pointer";
 });
 //
 // // Change it back to a pointer when it leaves.
-				map.on('mouseleave', 'fireTime', function () {
-map.getCanvas().style.cursor = 'pointer';
+				map.on("mouseleave", "fireTime", function () {
+map.getCanvas().style.cursor = "pointer";
 });
 
 		</script>
+		<p id="output"></p>
 	</body>
 </html>
