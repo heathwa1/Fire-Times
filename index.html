@@ -25,24 +25,6 @@
 		<script>
 			//copy your access token here
 
-
-			var endTime=new Date("FirstUnitOnscene")
-// 			var startTime=new Date("CallReceived");
-// 			if (endTime < startTime) {
-//     		endTime.setDate(endTime.getDate() + 1);
-// }
-// 			var diff = endTime - startTime;
-// 			var time = diff;
-// 			var mm = Math.floor(time / 1000 / 60);
-// 					time -= mm * 1000 * 60;
-// 			var ss = Math.floor(time / 1000);
-// 					time -= ss * 1000;
-			// var time=JSONstringify.DateTime.(endTime minus(startTime))
-document.getElementById("output").innerHTML=endTime
-
-
-
-
 			 mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw"; //"yourAccessTokenHere";
 
 			var map = new mapboxgl.Map({
@@ -53,21 +35,14 @@ document.getElementById("output").innerHTML=endTime
 				// starting zoom
 			});
 
-// filters for classifying time duration into five categories based on magnitude
 
-var time1 = ["<", ["get", "time"], "00:02:00"];
-var time2 = ["all", [">=", ["get", "time"], "00:02:00"], ["<", ["get", "time"], "00:04:00"]];
-var time3 = ["all", [">=", ["get", "time"], "00:04:00"], ["<", ["get", "time"], "00:06:00"]];
-var time4 = ["all", [">=", ["get", "time"], "00:06:00"], ["<", ["get", "time"], "00:08:00"]];
-var time5 = [">=", ["get", "RespTime"], "00:08:00"];
-
-// colors to use for the categories
-var colors = ["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c"];
 
 
 // Add GeoJSON layer
 // on map load, run function to load the geojson
 			map.on("load", function(){
+
+
 
 			// map.addSource("districts",{
 			// 	"type":"geojson",
@@ -99,7 +74,7 @@ var colors = ["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c"];
 			// });
 			map.addSource("FireTable", {
 						"type": "geojson",
-						"data": "https://data.cityoftacoma.org/resource/3h44-385s.geojson",
+						"data": "FireTable_ShaperCon.json",
 						"generateId":true
 						 });
 
@@ -109,17 +84,8 @@ var colors = ["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c"];
 				"source": "FireTable",
 				"paint": {
 					"circle-color": [
-					"match",
-					"time1",
-					"colors"[0],
-					"time2",
-					"colors"[1],
-					"time3",
-					"colors"[2],
-					"time4",
-					"colors"[3],
-					"time5",
-					"colors"[4]
+					"rgb",["get","CallReceived"],
+					0,["-",100["get","CallReceived"]]
 					]
 		 		}
 		 	});
