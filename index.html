@@ -27,14 +27,11 @@
 
 			 mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw"; //"yourAccessTokenHere";
 		// set times increments for response time duration
-		//  var time1 = ["<", ["get", "RespTime"], "00:02:00"];
-		//  var time2 = ["all", [">=", ["get", "RespTime"], "00:02:00"], ["<", ["get", "RespTime"], "00:04:00"]];
-		//  var time3 = ["all", [">=", ["get", "RespTime"], "00:04:00"], ["<", ["get", "RespTime"], "00:06:00"]];
-		//  var time4 = ["all", [">=", ["get", "RespTime"], "00:06:00"], ["<", ["get", "RespTime"], "00:08:00"]];
-		//  var time5 = [">=", ["get", "RespTime"], "00:08:00"];
-		//
-		//  // colors to use for the categories
-		//  var colors = ["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c"];
+
+		// document.getElementById("output").innerHTML=seconds
+
+		 // colors to use for the categories
+		 var colors = ["#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c"];
 
 			var map = new mapboxgl.Map({
 			  container:"map", // HTML container id
@@ -46,7 +43,7 @@
 
 // Add GeoJSON layer
 // on map load, run function to load the geojson
-			map.on("load", function(){
+		map.on("load", function(){
 
 			// map.addSource("districts",{
 			// 	"type":"geojson",
@@ -76,41 +73,95 @@
 			// 	}
 			// }
 			// });
-			map.addSource("FireTable", {
-						"type": "geojson",
-						"data": "TacomaFire.geojson",
-						"cluster":"true",
-						"clusterMaxZoom": 12,
-						"clusterRadius":35
-						 });
+		map.addSource("FireTable", {
+				"type": "geojson",
+				"data": "FireTimeString.geojson",
+				"cluster":true,
+				"clusterMaxZoom":12,
+				"clusterRadius":75
 
-			map.addLayer({
-				"id": "fireTime",
+		  });
+
+		map.addLayer({
+				"id": "clusters",
 				"type": "circle",
 				"source": "FireTable",
 				"paint": {
-					"circle-color":
-						"step",
-}
-});
-});
+					"circle-color":[
+						"step",["get","point_count"],
+						"#51bbd6",
+						75,
+						"#f1f075",
+						300,
+						"#f28cb1",
+						500,
+						
+						"grey"
+					],
+				}
+		});
+		map.addLayer({
+				"id":"cluster-count",
+				"type":"symbol",
+				"source":"FireTable",
+				"filter":["has","point_count"],
+				"layout":{
+						"text-field":"{point_count_abbreviated}",
+						"text-font":["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+						"text-size":12
+				}
+		});
+		map.addLayer({
+				"id":"unclustered-point",
+				"type":"circle",
+				"source":"FireTable",
+				"filter":["!",["has","point_count"]],
+				"paint":{
+						"circle-color":"#11b4da",
+						"circle-radius":4,
+						"circle-stroke-width":1,
+						"circle-stroke-color":"#fff"
+				}
+		});
+		map.on("click","clusters",function(e){
+				var features = map.queryRenderedFeatures(e.point,
+					{
+						layers:["clusters"]
+
+				});
+				var clusterId= features[0].properties.cluster_id;
+				map.getSource("FireTable").getClusterExpanssionZoom(
+					clusterId,
+					function(err, zoom){
+						if (err)return;
+
+						map.easeTo({
+							"center":
+								features[0].geometry.coordinates,
+								"zoom":"zoom"
+						});
+					}
+				);
+		});
+	});
 
 
-			map.on("click", "fireTime", function (e) {
-			new mapboxgl.Popup()
-			.setLngLat(e.lngLat)
-			.setHTML("Date: <b>" +e.features[0].properties.RespTime + "</b>")
-			.addTo(map);
-			});
-
-			map.on("mouseenter", "fireTime", function () {
-map.getCanvas().style.cursor = "pointer";
-});
 //
-// // Change it back to a pointer when it leaves.
-				map.on("mouseleave", "fireTime", function () {
-map.getCanvas().style.cursor = "pointer";
-});
+// 			map.on("click", "fireTime", function (e) {
+// 			new mapboxgl.Popup()
+// 			.setLngLat(e.lngLat)
+// 			.setHTML("Date: <b>" +e.features[0].properties.RespTime + "</b>")
+// 			.addTo(map);
+// 			});
+//
+// 			map.on("mouseenter", "fireTime", function () {
+// map.getCanvas().style.cursor = "pointer";
+// });
+// //
+// // // Change it back to a pointer when it leaves.
+// 				map.on("mouseleave", "fireTime", function () {
+// map.getCanvas().style.cursor = "pointer";
+// });
 
 		</script>
 		<p id="output"></p>
