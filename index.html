@@ -19,8 +19,9 @@
 	<div id="map"></div>
 <script>
 
-// var endTime=new Obj("Onscene")
-// 			var startTime=new Obj("CallRec");
+
+// var endTime=new Date("Onscene")
+// 			var startTime=new Date("CallRec");
 // 			if (endTime < startTime) {
 //     		endTime.setDate(endTime.getDate() + 1);
 // }
@@ -31,9 +32,7 @@
 // 			var ss = Math.floor(time / 1000);
 // 		time -= ss * 1000;
 
-
 			//copy your access token here
-
 			 mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw"; //"yourAccessTokenHere";
 
 		var map = new mapboxgl.Map({
@@ -47,25 +46,23 @@
 // Add GeoJSON layer
 // on map load, run function to load the geojson
 	map.on("load",function(){
+		map.loadImage("fire-station-11.svg",
+			function (error,image){
+				if (error) throw error;
+				map.addImage("smFlame",image);
+				map.addSource("FireTable",{
+					"type":"geojson",
+					"data":"TacFireShp.json"
+				});
+		});
 
-	map.addSource("FireTable", {
+				map.addSource("FireTable", {
 				"type": "geojson",
 				"data": "TacFireShp.json",
 				"cluster": true,
 				"clusterMaxZoom": 14,
 				"clusterRadius":50
-	});
-	// map.addLayer({
-	// 	"id":"fireTable",
-	// 	"type":"circle",
-	// 	"source":"FireTable",
-	// 	"paint":{
-	// 		"circle-color":"blue"
-	// 	}
-	//
-	// });
-	//
-	// document.getElementById("output").innerHTML="OnScene"
+});
 
 		map.addLayer({
 				"id": "clusters",
@@ -91,7 +88,7 @@
 						30,
 						90,
 						40
-						
+
 
 
 					]
@@ -110,15 +107,15 @@
 		});
 		map.addLayer({
 				"id":"unclustered-point",
-				"type":"circle",
+				"type":"symbol",
 				"source":"FireTable",
-				"filter":["!",["has","point_count"]],
-				"paint":{
-						"circle-color":"#11b4da",
-						"circle-radius":4,
-						"circle-stroke-width":1,
-						"circle-stroke-color":"#fff"
-				}
+				"layout": {
+						"icon-image": "smFlame",
+						"icon-size":5
+				},
+				 "filter":["!",["has","point_count"]],
+
+			 });
 		});
 		map.on("click","clusters",function(e){
 				var features = map.queryRenderedFeatures(e.point,
@@ -140,7 +137,7 @@
 					}
 				);
 		});
-	});
+
 
 
 
