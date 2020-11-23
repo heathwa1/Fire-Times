@@ -16,64 +16,22 @@
 
 	<body>
 		<!-- create div for the map here -->
-	<style>
-
-		.map-overlay {
-				font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-				position: absolute;
-				width: 25%;
-				top: 0;
-				left: 0;
-				padding: 10px;
-		}
-
-		.map-overlay .map-overlay-inner {
-				background-color: #fff;
-				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-				border-radius: 3px;
-				padding: 10px;
-				margin-bottom: 10px;
-		}
-
-		.map-overlay h2 {
-				line-height: 24px;
-				display: block;
-				margin: 0 0 10px;
-		}
-		.map-overlay .legend .bar {
-				height: 10px;
-				width: 100%;
-				background: linear-gradient(to right, #fca107, #7f3121);
-		}
-
-		.map-overlay input {
-				background-color: transparent;
-				display: inline-block;
-				width: 100%;
-				position: relative;
-				margin: 0;
-				cursor: ew-resize;
-		}
-	</style>
-
 	<div id="map"></div>
-
-	<div class="map-overlay top">
-			<div class="map-overlay-inner">
-				<h2>Hot Spots Over the Years</h2>
-				<label id="month"></label>
-				<input id="slider" type="range" min="0" max="11" step="1" value="0" />
-			</div>
-			<div class="map-overlay-inner">
-			<div id="legend" class="legend">
-			<div class="bar"></div>
-			<div>Magnitude (m)</div>
-		</div>
-		</div>
-	</div>
-
-	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
+
+// var endTime=new Obj("Onscene")
+// 			var startTime=new Obj("CallRec");
+// 			if (endTime < startTime) {
+//     		endTime.setDate(endTime.getDate() + 1);
+// }
+// 			var diff = endTime - startTime;
+// 			var time = diff;
+// 			var mm = Math.floor(time / 1000 / 60);
+// 			time -= mm * 1000 * 60;
+// 			var ss = Math.floor(time / 1000);
+// 		time -= ss * 1000;
+
+
 			//copy your access token here
 
 			 mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw"; //"yourAccessTokenHere";
@@ -88,270 +46,102 @@
 
 // Add GeoJSON layer
 // on map load, run function to load the geojson
-		var years =[
-			'2016',
-			'2017',
-			'2018',
-			'2019',
-			'2020'
-		];
-	function filterBy(year){
-		var filters = ['==','IncidentYear', year];
-		map.setFilter('fire-circles',filters);
-		map.setFiler('fire-labels',filters);
-		document.getElementById('IncidentYear').textContent=IncidentYear[year];
-	}
+	map.on("load",function(){
 
-	map.on("load", function(){
-		d3.json("FireTimeString.geojson",
-function (err, data) {
-if (err) throw err;
-		data.features=data.features.map(function
-			(d){
-				d.properties.IncidentYear= new Date(d.properties.time).getYear();
-				return d;
-
-		});
-
-			// map.addSource("districts",{
-			// 	"type":"geojson",
-			// 	"data":"districts.geojson"
-			// });
-			 // var dur= Duration.fromObject(properties.RespTime)
-			 // dur.shiftTo("minutes", "seconds").toObject();
-			// map.addLayer({
-			// 	"id":"hoods",
-			// 	"type":"fill",
-			// 	"geometry-type":"Polygon",
-			// 	"source":"districts",
-			// 	"paint":{
-			// 		"fill-color":{
-			// 			"type":"categorical",
-			// 			"property":"NAME",
-			// 			"stops":[
-			// 			["CENTRAL","red"],
-			// 			["EASTSIDE","orange"],
-			// 			["NEW TACOMA","yellow"],
-			// 			["NORTH EAST","green"],
-			// 			["NORTH END","blue"],
-			// 			["SOUTH END","purple"],
-			// 			["SOUTH TACOMA","grey"],
-			// 			["WEST END","pink"]
-			// 		]
-			// 	}
-			// }
-			// });
 	map.addSource("FireTable", {
 				"type": "geojson",
-				"data": "data"
+				"data": "TacFireShp.json",
+				"cluster": true,
+				"clusterMaxZoom": 14,
+				"clusterRadius":50
 	});
-	map.addLayer({
-		"id":"fireYears",
-		"type":"circle",
-		"source":"FireTable",
-		"paint":{
-			"circle-color":[
-				"interpolate",
-				["linear"],
-				["get","IncidentYear"],
-				2016,
-				"red",
-				2017,
-				"blue",
-				2018,
-				"green",
-				2019,
-				"#ffc11f",
-				2020,
-				"purple"
-			],
-				"circle-opacity":0.75,
-				"circle-radius":5
-		}
-	});
-	filterBy(0);
-	document
-	.getElementById("slider")
-	.addEventListener("input",function
-		(e){
-			var year= parseInt(e.target.value,10);
-			filterBy(year);
-		});
-
-	}),
-
-
-
-				// "cluster":true,
-				// "clusterMaxZoom":12,
-				// "clusterRadius":75
-  });
-
-	// 	map.addLayer({
-	// 		"id":"hotSpots",
-	// 		"type":"heatmap",
-	// 		"source":"FireTable",
-	// 		"maxzoom":9,
-	// 		"paint":{
-	// 			"heatmap-weight":[
-	// 					"interpolate",
-	// 					["linear"],
-	// 					["get","RespTime"],
-	// 					0,
-	// 					0,
-	// 					6,
-	// 					1
-	// 			],
-	// 			"heatmap-intensity":[
-	// 				"interpolate",
-	// 				["linear"],
-	// 				["zoom"],
-	// 				0,
-	// 				1,
-	// 				9,
-	// 				3
-	// 			],
-	// 			"heatmap-color":[
-	// 				"interpolate",
-	// 				["linear"],
-	// 				["heatmap-density"],
-	// 				0,
-	// 				"rgba(103,102,172,0)",
-	// 				0.2,
-	// 				"rgb(103,169,207)",
-	// 				0.4,
-	// 				"rgb(209,229,240)",
-	// 				0.6,
-	// 				"rgb(253,219,199)",
-	// 				0.8,
-	// 				"rgb(239,138,98)",
-	// 				1,
-	// 				"rgb(178,24,43)"
-	// 			],
-	// 			"heatmap-radius":[
-	// 				"interpolate",
-	// 				["linear"],
-	// 				["zoom"],
-	// 				7,
-	// 				1,
-	// 				9,
-	// 				0
-	// 			]
-	//
-	// 	},
-	// });
 	// map.addLayer({
-	// 	"id":"fireCalls",
+	// 	"id":"fireTable",
 	// 	"type":"circle",
 	// 	"source":"FireTable",
-	// 	"minzoom":7,
 	// 	"paint":{
-	// 			"circle-radius":[
-	// 				"interpolate",
-	// 				["linear"],
-	// 				["zoom"],
-	// 				7,
-	// 				["interpolate",["linear"],
-	// 					["get","RespTime"],1,1,6,4],
-	// 					16,
-	// 				["interpolate",["linear"],
-	// 					["get","RespTime"],1,5,6,50]			  ],
-	// 			"circle-color":[
-	// 				"interpolate",
-	// 				["linear"],
-	// 				["get","RespTime"],
-	// 					1,
-	// 					"rgba(33,102,172,0)",
-	// 					2,
-	// 					"rgb(103,169,207)",
-	// 					3,
-	// 					"rgb(209,229,240)",
-	// 					4,
-	// 					"rgb(253,219,199)",
-	// 					5,
-	// 					"rgb(239,138,98)",
-	// 					6,
-	// 					"rgb(178,24,43)"
-	// 			],
-	// 			"circle-stroke-color":"white",
-	// 			"circle-stroke-width":1,
-	// 					"circle-opacity":[
-	// 						"interpolate",
-	// 						["linear"],
-	// 						["zoom"],
-	// 						7,
-	// 						0,
-	// 						8,
-	// 						1
-	// 					]
-	// 				}
-	// 			},
-	// 		);
+	// 		"circle-color":"blue"
+	// 	}
+	//
 	// });
+	//
+	// document.getElementById("output").innerHTML="OnScene"
+
+		map.addLayer({
+				"id": "clusters",
+				"type": "circle",
+				"source": "FireTable",
+				"paint": {
+					"circle-color":[
+						"step",["get","point_count"],
+						"#51bbd6",
+						30,
+						"#f1f075",
+						90,
+						"#f28cb1",
+						120,
+						"grey",
+
+					],
+					"circle-radius":[
+						"step",
+						["get","point_count"],
+						20,
+						30,
+						30,
+						90,
+						40
+						
 
 
-	// 	map.addLayer({
-	// 			"id": "clusters",
-	// 			"type": "circle",
-	// 			"source": "FireTable",
-	// 			"paint": {
-	// 				"circle-color":[
-	// 					"step",["get","point_count"],
-	// 					"#51bbd6",
-	// 					75,
-	// 					"#f1f075",
-	// 					300,
-	// 					"#f28cb1",
-	// 					500,
-	//
-	// 					"grey"
-	// 				],
-	// 			}
-	// 	});
-	// 	map.addLayer({
-	// 			"id":"cluster-count",
-	// 			"type":"symbol",
-	// 			"source":"FireTable",
-	// 			"filter":["has","point_count"],
-	// 			"layout":{
-	// 					"text-field":"{point_count_abbreviated}",
-	// 					"text-font":["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-	// 					"text-size":12
-	// 			}
-	// 	});
-	// 	map.addLayer({
-	// 			"id":"unclustered-point",
-	// 			"type":"circle",
-	// 			"source":"FireTable",
-	// 			"filter":["!",["has","point_count"]],
-	// 			"paint":{
-	// 					"circle-color":"#11b4da",
-	// 					"circle-radius":4,
-	// 					"circle-stroke-width":1,
-	// 					"circle-stroke-color":"#fff"
-	// 			}
-	// 	});
-	// 	map.on("click","clusters",function(e){
-	// 			var features = map.queryRenderedFeatures(e.point,
-	// 				{
-	// 					layers:["clusters"]
-	//
-	// 			});
-	// 			var clusterId= features[0].properties.cluster_id;
-	// 			map.getSource("FireTable").getClusterExpanssionZoom(
-	// 				clusterId,
-	// 				function(err, zoom){
-	// 					if (err)return;
-	//
-	// 					map.easeTo({
-	// 						"center":
-	// 							features[0].geometry.coordinates,
-	// 							"zoom":"zoom"
-	// 					});
-	// 				}
-	// 			);
-	// 	});
-	// });
+					]
+				}
+		});
+		map.addLayer({
+				"id":"cluster-count",
+				"type":"symbol",
+				"source":"FireTable",
+				"filter":["has","point_count"],
+				"layout":{
+						"text-field":"{point_count_abbreviated}",
+						"text-font":["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+						"text-size":12
+				}
+		});
+		map.addLayer({
+				"id":"unclustered-point",
+				"type":"circle",
+				"source":"FireTable",
+				"filter":["!",["has","point_count"]],
+				"paint":{
+						"circle-color":"#11b4da",
+						"circle-radius":4,
+						"circle-stroke-width":1,
+						"circle-stroke-color":"#fff"
+				}
+		});
+		map.on("click","clusters",function(e){
+				var features = map.queryRenderedFeatures(e.point,
+					{
+						layers:["clusters"]
+
+				});
+				var clusterId= features[0].properties.cluster_id;
+				map.getSource("FireTable").getClusterExpanssionZoom(
+					clusterId,
+					function(err, zoom){
+						if (err)return;
+
+						map.easeTo({
+							"center":
+								features[0].geometry.coordinates,
+								"zoom":"zoom"
+						});
+					}
+				);
+		});
+	});
+
 
 
 
