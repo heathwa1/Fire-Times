@@ -16,30 +16,68 @@
 
 	<body>
 		<!-- create div for the map here -->
-		<div id="map"></div>
-			<div id="output"</div>
+	<style>
 
+		.map-overlay {
+				font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+				position: absolute;
+				width: 25%;
+				top: 0;
+				left: 0;
+				padding: 10px;
+		}
 
+		.map-overlay .map-overlay-inner {
+				background-color: #fff;
+				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+				border-radius: 3px;
+				padding: 10px;
+				margin-bottom: 10px;
+		}
 
-		<!-- JS code for the map goes here -->
-		<script>
+		.map-overlay h2 {
+				line-height: 24px;
+				display: block;
+				margin: 0 0 10px;
+		}
+		.map-overlay .legend .bar {
+				height: 10px;
+				width: 100%;
+				background: linear-gradient(to right, #fca107, #7f3121);
+		}
+
+		.map-overlay input {
+				background-color: transparent;
+				display: inline-block;
+				width: 100%;
+				position: relative;
+				margin: 0;
+				cursor: ew-resize;
+		}
+	</style>
+
+	<div id="map"></div>
+
+	<div class="map-overlay top">
+			<div class="map-overlay-inner">
+				<h2>Hot Spots Over the Years</h2>
+				<label id="month"></label>
+				<input id="slider" type="range" min="0" max="11" step="1" value="0" />
+			</div>
+			<div class="map-overlay-inner">
+			<div id="legend" class="legend">
+			<div class="bar"></div>
+			<div>Magnitude (m)</div>
+		</div>
+		</div>
+	</div>
+
+	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
 			//copy your access token here
 
 			 mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw"; //"yourAccessTokenHere";
 
-// document.getElementById("ouput").innerHTML="RespTime"
-var DateTime=luxon.DateTime;
-
-
-document.getElementById("output").innerHTML=DateTime
-var time=getTime("RespTime")
-		function timeToDecimal() {
-		var arr = t.split(':');
-		var dec = parseInt((arr[1]/6)*10, 10);
-
-		return parseFloat(parseInt(arr[0], 10) + '.' + (dec<10?'0':'') + dec);
-
-	};
 		var map = new mapboxgl.Map({
 			  container:"map", // HTML container id
 			  style: "mapbox://styles/mapbox/streets-v11",  // style URL
@@ -50,8 +88,30 @@ var time=getTime("RespTime")
 
 // Add GeoJSON layer
 // on map load, run function to load the geojson
+		var years =[
+			'2016',
+			'2017',
+			'2018',
+			'2019',
+			'2020'
+		];
+	function filterBy(year){
+		var filters = ['==','IncidentYear', year];
+		map.setFilter('fire-circles',filters);
+		map.setFiler('fire-labels',filters);
+		document.getElementById('IncidentYear').textContent=IncidentYear[year];
+	}
 
 	map.on("load", function(){
+		d3.json("FireTimeString.geojson",
+function (err, data) {
+if (err) throw err;
+		data.features=data.features.map(function
+			(d){
+				d.properties.IncidentYear= new Date(d.properties.time).getYear();
+				return d;
+
+		});
 
 			// map.addSource("districts",{
 			// 	"type":"geojson",
@@ -81,117 +141,153 @@ var time=getTime("RespTime")
 			// 	}
 			// }
 			// });
-		map.addSource("FireTable", {
+	map.addSource("FireTable", {
 				"type": "geojson",
-				"data": "FireTimeString.geojson"
+				"data": "data"
+	});
+	map.addLayer({
+		"id":"fireYears",
+		"type":"circle",
+		"source":"FireTable",
+		"paint":{
+			"circle-color":[
+				"interpolate",
+				["linear"],
+				["get","IncidentYear"],
+				2016,
+				"red",
+				2017,
+				"blue",
+				2018,
+				"green",
+				2019,
+				"#ffc11f",
+				2020,
+				"purple"
+			],
+				"circle-opacity":0.75,
+				"circle-radius":5
+		}
+	});
+	filterBy(0);
+	document
+	.getElementById("slider")
+	.addEventListener("input",function
+		(e){
+			var year= parseInt(e.target.value,10);
+			filterBy(year);
 		});
+
+	}),
+
+
 
 				// "cluster":true,
 				// "clusterMaxZoom":12,
 				// "clusterRadius":75
+  });
 
-	//  });
-		map.addLayer({
-			"id":"hotSpots",
-			"type":"heatmap",
-			"source":"FireTable",
-			"maxzoom":9,
-			"paint":{
-				"heatmap-weight":[
-						"interpolate",
-						["linear"],
-						["get","RespTime"],
-						0,
-						0,
-						6,
-						1
-				],
-				"heatmap-intensity":[
-					"interpolate",
-					["linear"],
-					["zoom"],
-					0,
-					1,
-					9,
-					3
-				],
-				"heatmap-color":[
-					"interpolate",
-					["linear"],
-					["heatmap-density"],
-					0,
-					"rgba(103,102,172,0)",
-					0.2,
-					"rgb(103,169,207)",
-					0.4,
-					"rgb(209,229,240)",
-					0.6,
-					"rgb(253,219,199)",
-					0.8,
-					"rgb(239,138,98)",
-					1,
-					"rgb(178,24,43)"
-				],
-				"heatmap-radius":[
-					"interpolate",
-					["linear"],
-					["zoom"],
-					7,
-					1,
-					9,
-					0
-				]
-
-		},
-	});
-	map.addLayer({
-		"id":"fireCalls",
-		"type":"circle",
-		"source":"FireTable",
-		"minzoom":7,
-		"paint":{
-				"circle-radius":[
-					"interpolate",
-					["linear"],
-					["zoom"],
-					7,
-					["interpolate",["linear"],
-						["get","RespTime"],1,1,6,4],
-						16,
-					["interpolate",["linear"],
-						["get","RespTime"],1,5,6,50]			  ],
-				"circle-color":[
-					"interpolate",
-					["linear"],
-					["get","RespTime"],
-						1,
-						"rgba(33,102,172,0)",
-						2,
-						"rgb(103,169,207)",
-						3,
-						"rgb(209,229,240)",
-						4,
-						"rgb(253,219,199)",
-						5,
-						"rgb(239,138,98)",
-						6,
-						"rgb(178,24,43)"
-				],
-				"circle-stroke-color":"white",
-				"circle-stroke-width":1,
-						"circle-opacity":[
-							"interpolate",
-							["linear"],
-							["zoom"],
-							7,
-							0,
-							8,
-							1
-						]
-					}
-				},
-			);
-	});
+	// 	map.addLayer({
+	// 		"id":"hotSpots",
+	// 		"type":"heatmap",
+	// 		"source":"FireTable",
+	// 		"maxzoom":9,
+	// 		"paint":{
+	// 			"heatmap-weight":[
+	// 					"interpolate",
+	// 					["linear"],
+	// 					["get","RespTime"],
+	// 					0,
+	// 					0,
+	// 					6,
+	// 					1
+	// 			],
+	// 			"heatmap-intensity":[
+	// 				"interpolate",
+	// 				["linear"],
+	// 				["zoom"],
+	// 				0,
+	// 				1,
+	// 				9,
+	// 				3
+	// 			],
+	// 			"heatmap-color":[
+	// 				"interpolate",
+	// 				["linear"],
+	// 				["heatmap-density"],
+	// 				0,
+	// 				"rgba(103,102,172,0)",
+	// 				0.2,
+	// 				"rgb(103,169,207)",
+	// 				0.4,
+	// 				"rgb(209,229,240)",
+	// 				0.6,
+	// 				"rgb(253,219,199)",
+	// 				0.8,
+	// 				"rgb(239,138,98)",
+	// 				1,
+	// 				"rgb(178,24,43)"
+	// 			],
+	// 			"heatmap-radius":[
+	// 				"interpolate",
+	// 				["linear"],
+	// 				["zoom"],
+	// 				7,
+	// 				1,
+	// 				9,
+	// 				0
+	// 			]
+	//
+	// 	},
+	// });
+	// map.addLayer({
+	// 	"id":"fireCalls",
+	// 	"type":"circle",
+	// 	"source":"FireTable",
+	// 	"minzoom":7,
+	// 	"paint":{
+	// 			"circle-radius":[
+	// 				"interpolate",
+	// 				["linear"],
+	// 				["zoom"],
+	// 				7,
+	// 				["interpolate",["linear"],
+	// 					["get","RespTime"],1,1,6,4],
+	// 					16,
+	// 				["interpolate",["linear"],
+	// 					["get","RespTime"],1,5,6,50]			  ],
+	// 			"circle-color":[
+	// 				"interpolate",
+	// 				["linear"],
+	// 				["get","RespTime"],
+	// 					1,
+	// 					"rgba(33,102,172,0)",
+	// 					2,
+	// 					"rgb(103,169,207)",
+	// 					3,
+	// 					"rgb(209,229,240)",
+	// 					4,
+	// 					"rgb(253,219,199)",
+	// 					5,
+	// 					"rgb(239,138,98)",
+	// 					6,
+	// 					"rgb(178,24,43)"
+	// 			],
+	// 			"circle-stroke-color":"white",
+	// 			"circle-stroke-width":1,
+	// 					"circle-opacity":[
+	// 						"interpolate",
+	// 						["linear"],
+	// 						["zoom"],
+	// 						7,
+	// 						0,
+	// 						8,
+	// 						1
+	// 					]
+	// 				}
+	// 			},
+	// 		);
+	// });
 
 
 	// 	map.addLayer({
@@ -258,22 +354,22 @@ var time=getTime("RespTime")
 	// });
 
 
+
+			map.on("click", "fireTime", function (e) {
+			new mapboxgl.Popup()
+			.setLngLat(e.lngLat)
+			.setHTML("Date: <b>" +e.features[0].properties.RespTime + "</b>")
+			.addTo(map);
+			});
+
+			map.on("mouseenter", "fireTime", function () {
+map.getCanvas().style.cursor = "pointer";
+});
 //
-// 			map.on("click", "fireTime", function (e) {
-// 			new mapboxgl.Popup()
-// 			.setLngLat(e.lngLat)
-// 			.setHTML("Date: <b>" +e.features[0].properties.RespTime + "</b>")
-// 			.addTo(map);
-// 			});
-//
-// 			map.on("mouseenter", "fireTime", function () {
-// map.getCanvas().style.cursor = "pointer";
-// });
-// //
-// // // Change it back to a pointer when it leaves.
-// 				map.on("mouseleave", "fireTime", function () {
-// map.getCanvas().style.cursor = "pointer";
-// });
+// // Change it back to a pointer when it leaves.
+				map.on("mouseleave", "fireTime", function () {
+map.getCanvas().style.cursor = "pointer";
+});
 
 		</script>
 		<p id="output"></p>
