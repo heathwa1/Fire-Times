@@ -1,3 +1,18 @@
-#cluster-count{
+.body {
+  font-family:"Helvetica" sans-serif;
+  font-size:14
+
+}
+h1 {
+  font-weight:bold;
+  font-size: 2em;
+  font-stretch:semi-expanded;
+  text-align: center;
+}
+
+.map {
+  height:80vh;
+}
+p {
 
 }
