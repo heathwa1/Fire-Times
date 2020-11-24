@@ -45,86 +45,51 @@
 
 // Add GeoJSON layer
 // on map load, run function to load the geojson
-	function AddImages(map,image){
-		const addImage = (map, id, url)=>{
-				return new Promise((resolve, reject)=>{
-					map.loadImage(url, (error, image)=> {
-						if(error){
-							reject(error);
-							return;
-						}
-						map.addImage(id, image);
-						resolve(image);
-					});
-				});
-		}
-		const promises = images.map( imageData=>addImage(map, imageData.id, imageData.url) );
-		return Promise.all(promises);
-}
+
 	map.on("load",function(){
-		addImages(map, [
-			{"url":"https://github.com/mapbox/maki.git",
-			"id":"fire-station-11"}
-		]).then(()=>{
+
 			map.addSource("FireTable",{
 				"type":"geojson",
 				"data":"TacFireShp.json",
 				"cluster":true,
 				"clusterMaxZoom":14,
-				"clusterRadius":50
+				"clusterRadius":30
 
 			});
-		});
-		// map.loadImage("fire-station-11",
-		// 	function (error,image){
-		// 		if (error) throw error;
-		// 		map.addImage("fire-station-11",image);
-		// 		map.addSource("https://github.com/mapbox/maki.git",{
-		// 			"type":"geojson",
-		// 			"data":"TacFireShp.json"
-		// 		});
-	//	});
-
 
 
 		map.addLayer({
 				"id": "clusters",
-				"type": "symbol",
+				"type": "circle",
 				"source": "FireTable",
-				"layout":{
-					"icon-image":"fire-station-11"
-				},
-				"icon-size":.4,
-				"icon-allow-overlap":true,
-			});
-			map.addLayer({
-				"id":"cluster-count-bg",
-				"type":"circle",
-				"source":"FireTable",
 				"filter":["has","point_count"],
-				"paint": {
-					"circle-color":[
-						"step",["get","point_count"],
-						"#51bbd6",
-						30,
-						"#f1f075",
-						90,
-						"#f28cb1",
-						120,
-						"grey",
-
-					],
-					"circle-radius":[
-						"step",
-						["get","point_count"],
-						20,
-						30,
-						30,
-						90,
-						40
-					]
+				"paint":{
+						"circle-color":[
+							"step",
+							["get","point_count"],
+							'#51bbd6',
+							40,
+							'#f1f075',
+							80,
+							'#f28cb1',
+							120,
+							"purple"
+						],
+						"circle-radius":[
+							"step",
+							["get","point_count"],
+							20,
+							40,
+							30,
+							80,
+							40,
+							120,
+							50
+						]
 				}
-		});
+			});
+
+
 		map.addLayer({
 				"id":"cluster-count",
 				"type":"symbol",
@@ -138,13 +103,13 @@
 		});
 		map.addLayer({
 				"id":"unclustered-point",
-				"type":"symbol",
+				"type":"circle",
 				"source":"FireTable",
 				"filter":["!",["has","point_count"]],
-				"layout": {
-						"icon-image": ["get","point_count"],
-						"icon-size":.4,
-						"icon-allow-overlap":true
+				"paint": {
+						"circle-color":"#ffc11f",
+						"circle-radius":4,
+						"circle-blur": 0.8,
 				},
 			});
 		 });
