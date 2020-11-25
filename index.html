@@ -8,10 +8,9 @@
 <link href ="https://cdn.jsdelivr.net/npm/luxon@1.25.0/build/global/luxon.min.js"/>
 
 
-
-
 		<style>
 		#map {height: 80vh; width:70%; align: center;}
+		#map2 {height: 80vh; width:70%; float:right;}
 		</style>
 	</head>
 
@@ -21,18 +20,6 @@
 	<div id="map"></div>
 <script>
 
-
-// var endTime=new Date("Onscene")
-// 			var startTime=new Date("CallRec");
-// 			if (endTime < startTime) {
-//     		endTime.setDate(endTime.getDate() + 1);
-// }
-// 			var diff = endTime - startTime;
-// 			var time = diff;
-// 			var mm = Math.floor(time / 1000 / 60);
-// 			time -= mm * 1000 * 60;
-// 			var ss = Math.floor(time / 1000);
-// 		time -= ss * 1000;
 
 			//copy your access token here
 			 mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw"; //"yourAccessTokenHere";
@@ -136,10 +123,6 @@
 				);
 		});
 
-
-
-
-
 			map.on("click", "fireTime", function (e) {
 			new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
@@ -148,9 +131,8 @@
 			});
 
 			map.on("mouseenter", "fireTime", function () {
-map.getCanvas().style.cursor = "pointer";
-});
-//
+				map.getCanvas().style.cursor = "pointer";
+			});
 // // Change it back to a pointer when it leaves.
 			map.on("mouseleave", "fireTime", function () {
 			map.getCanvas().style.cursor = "pointer";
@@ -158,22 +140,213 @@ map.getCanvas().style.cursor = "pointer";
 
 		</script>
 <div id="map2" "width:50%"></div>
+<style>
+	/* .map-overlay {
+		font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+		position: absolute;
+		width: 25%;
+		top: 0;
+		left: 0;
+		padding: 10px;
+	}
 
+	.map-overlay .map-overlay-inner {
+		background-color: #fff;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+		border-radius: 3px;
+		padding: 10px;
+		margin-bottom: 10px;
+	}
+
+	.map-overlay h2 {
+		line-height: 24px;
+		display: block;
+		margin: 0 0 10px;
+	}
+
+.map-overlay .legend .bar {
+	height: 10px;
+	width: 100%;
+	background: linear-gradient(to right, #fca107, #7f3121);
+}
+
+.map-overlay input {
+	background-color: transparent;
+	display: inline-block;
+	width: 100%;
+	position: relative;
+	margin: 0;
+	cursor: ew-resize;
+} */
+
+
+/* <!-- <div class="map-overlay top">
+		<div class="map-overlay-inner">
+				<h2>Years of Fires in Tacoma</h2>
+				<label id="month"></label>
+				<input id="slider" type="range" min="0" max="11" step="1" value="0" />
+		</div>
+		<div class="map-overlay-inner">
+			<div id="legend" class="legend">
+				<div class="bar"></div>
+				<div>Year</div>
+			</div>
+		</div>
+</div>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script> --> */
+#menu {
+		background: #fff;
+		position: absolute;
+		z-index: 1;
+		top: 10px;
+		right: 10px;
+		border-radius: 3px;
+		width: 120px;
+		border: 1px solid black;
+		font-family: 'Open Sans', sans-serif;
+}
+
+#menu a {
+		font-size: 13px;
+		color: #404040;
+		display:block;
+		margin: 0;
+		padding: 0;
+		padding: 10px;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(0,0,0,0.25);
+		text-align:center;
+}
+#menu a:last-child {
+		border: none;
+}#menu a:hover{
+		background-color: #f8f8f8;
+		color: #404040;
+}
+#menu a.active {
+		background-color: #3887be;
+		color: #ffffff;
+}
+#menu a.active:hover {
+		bakground: #3074a4;
+}
+</style>
+
+<nav id="menu"></nav>
+<div id="map2" "width:50%"></div>
 
 <script>
 		mapboxgl.accessToken = "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw";
 		var map2 = new mapboxgl.Map({
-				container:"map2", // HTML container id
-				// style: "mapbox:styles/h-warren/ckhwau1g7039u19nz7wqszag9",   //style URL
-				// center:[-122.4733, 47.255], // starting position as [lng, lat]
-				// zoom: 11
-				// starting zoom
+				container:"map2",
+				style: "mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9",   //style URL
+				center:[-122.4733, 47.255], // starting position as [lng, lat]
+				zoom: 11
 		});
-	map2.on("load",function(){
-		map2.addLayer({
-			"source":"mapbox:styles/h-warren/ckhwau1g7039u19nz7wqszag9"
-});
+	map.on("load", function(){
+	map.addSource("FireTable",{
+			"type":"geojson",
+			"source":"Class_Fire"
 	});
+
+	map.addLayer({
+			"id":"years",
+			"type":"circle",
+			"source":"FireTable",
+			"layout": {
+					"visibility":"visible"
+			},
+			"paint": {
+
+			}
+
+
+
+
+	})
+
+// 		var years = [
+// 				2015,
+// 				2016,
+// 				2017,
+// 				2018,
+// 				2019,
+// 				2020
+// 			];
+// 	function filterBy(year){
+// 		var filters = ['==','IncidentYear',year];
+// 	map.setFilter('fire-circles',filters);
+// 	map.setFilter('fire-lables',filter);
+// 	document.getElementById('IncidentYear').textContent=years[year];
+// 	}
+// 	map.on("load",function(){
+// 	d3.json("Class_Fire.json",
+// 			function(err,data){
+// 				if(err) throw err;
+// 			data.features=
+// 				data.features.map(function(d)){
+// 					d.properties.IncidentYear=NEW
+// 						Date(d.properties.time),getYear();
+// 					return d;
+// 				});
+//
+// 	map.addSource("FireTable"{
+// 			"type":"geojson",
+// 			"data":"data"
+// 	});
+// 	map.addLayer({
+// 			"id":"fire-circles",
+// 			"type":"circle",
+// 			"source":"FireTable",
+// 			"paint": {
+// 					"circle-color":[
+// 							"interpolate",
+// 							["linear"],
+// 							["get","Response"],
+// 							1,
+// 							"blue",
+// 							2,
+// 							"yellow",
+// 							3,
+// 							"green",
+// 							4,
+// 							"purple"
+// 					],
+// 					"circle-opacity":0.75,
+// 					"circle-blur":0.5
+// 			}
+// 	});
+// 	map.addLayer({
+// 			"id":"fire-labels",
+// 			"type":"symbol",
+// 			"source":"FireTable",
+// 			"layout": {
+// 					"text-field":[
+// 								"concat",
+// 								["to-string",["get","Response"]],
+// 								"Day Part"
+// 						],
+// 					"text-font":[
+// 						"Open Sans Bold",
+// 						"Arial Unicode MS Bold"
+// 					],
+// 					"text-size":10
+// 				},
+// 				"paint":{
+// 						"text-color": "rgba(0,0,0,0.5)"
+// 				}
+// 	});
+// 	filterBy(0);
+// 	document
+// 			.getElementById("slider")
+// 			.addEventListener("input",function(e){
+// 					var year=parseInt(e.target.value, 10);
+// 					filterBy(year);
+// 			});
+// 		}
+// 	);
+// });
+
 
 
 		</script>
