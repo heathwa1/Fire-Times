@@ -228,8 +228,15 @@
 		color: #ffffff;
 }
 #menu a.active:hover {
-		bakground: #3074a4;
+		background-color: #3074a4;
 }
+.marker {
+		display:block;
+		border: none;
+		cursor:pointer;
+		padding: 0
+}
+
 </style>
 
 <nav id="menu"></nav>
@@ -238,25 +245,82 @@
 <script>
 		// mapboxgl.accessToken =
 		"pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw";
-		 // "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw";
+		  // "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw";
 		var map2 = new mapboxgl.Map({
 				container:"map2",
-				 style: "mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q",
+				   style: //mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q",
 				"mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9",   //style URL
 				center:[-122.4733, 47.255], // starting position as [lng, lat]
 				zoom: 11
 		});
-	map.on("load", function(){
-	map.addSource("TacFire",{
-			"type":"geojson",
-			"data":"Class_Fire.json"
-	});
+var toggleableLayerIds=["2017","2018","2019","2020"];
+ 		for (var i = 0; i< toggleableLayerIds.length; i++){
+	 	var id = toggleableLayerIds[i];
+		link.href = //mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q",
+	"//mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9";
+		link.clasName = "active";
+		link.textContent = id;
 
-	// map.addLayer({
-	// 		"id":"2017",
-	// 		"type":"circle",
-	// 		"source":"TacFire",
-	// 		"layout": {
+		link.onclick = function (e) {
+				var clickedLayer = this.textContent;
+				e.preventDefault();
+				e.stopPropagation();
+
+				var visibility = map.getLayoutProperty(clickedLayer,"visibility");
+				if (visibility === "visible") {
+					map.setLayoutProperty(clickedLayer, "visibility", "none");
+					properties.Incidentyear = "";
+				}
+				else {
+					this.className = "active";
+					map.setLayoutProperty(clickedLayer, "visibility", "visible");
+				}
+		};
+		var button =document.createElement("div");
+		button.appendChild(link);
+		var layers = document.getElementById("menu");
+		layers.appendChild(button);
+ }
+
+	map.on("load", function(){
+		// map.loadImage("smGrnflame.png",
+		// 					function(error,image){
+		// 						if (error) throw error;
+		// 						map.addImage("grnflame", image);
+		map.addSource("Mono2",{
+			"type":"geojson",
+			"url":	"//mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9"
+
+		});
+
+	map.addLayer({
+	 		"id":"2017",
+	 		"type":"circle",
+			"source":"composite",
+			"source-layer":"TacFire-5qm3nd",
+			"layout": {
+				"visibility":"visible",
+			},
+					"paint": {
+							"circle-color":[
+								"case",
+								["get","IncidentYe"],
+								2017,
+								"green",
+								"black"
+
+							],
+							"circle-radius":4,
+							"circle-blur":.7
+					},
+
+
+
+		});
+		});
+
+
+//});
 	// 				"visibility":"visible"
 	// 		},
 	// 		"paint": {
@@ -271,10 +335,10 @@
 	// 		},
 	// 		"source-layer":"IncidentYe"
 	// });
-	map.addLayer({
-		"id":"2018",
-		"type":"vector",
-		"source":"TacFire",
+	// map.addLayer({
+	// 	"id":"2018",
+	// 	"type":"vector",
+	// 	"source":"TacFire",
 	// 	"layout": {
 	// 			"visibility":"visible"
 	// 	},
@@ -334,7 +398,9 @@
 	// 	var layers = document.getElementById('menu');
 	// 	layers.appendChild(link);
 	// }
-});
+// });
+// });
+
 
 // 		var years = [
 // 				2015,
