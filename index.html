@@ -9,8 +9,8 @@
 
 
 		<style>
-		#map {height: 80vh; width:70vw; align: center;}
-		#map2 {height: 80vh; width:70vw; float:right;}
+		#map {height: 80vh; width:auto; align: center;}
+		#map2 {height: 80vh; width:auto; }
 		</style>
 	</head>
 
@@ -109,7 +109,7 @@
 
 				});
 				var clusterId= features[0].properties.cluster_id;
-				map.getSource("FireTable").getClusterExpanssionZoom(
+				map.getSource("FireTable").getClusterExpansionZoom(
 					clusterId,
 					function(err, zoom){
 						if (err)return;
@@ -123,10 +123,10 @@
 				);
 		});
 
-			map.on("click", "fireTime", function (e) {
+			map.on("click", "FireTable", function (e) {
 			new mapboxgl.Popup()
 			.setLngLat(e.lngLat)
-			.setHTML("Date: <b>" +e.features[0].properties.RespTime + "</b>")
+			.setHTML("Type of fire: <b>" +e.features[0].properties.FireType + "</b>")
 			.addTo(map);
 			});
 
@@ -139,7 +139,7 @@
 			});
 
 		</script>
-<div id="map2" "width:50%"></div>
+
 <style>
 	/* .map-overlay {
 		font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
@@ -194,7 +194,7 @@
 		</div>
 </div>
 <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script> --> */
-#menu {
+/* #menu {
 		background: #fff;
 		position: absolute;
 		z-index: 1;
@@ -238,18 +238,18 @@
 }
 
 </style>
-
-<nav id="menu"></nav>
+<div>
 <div id="map2" "width:50%"></div>
-
+<div><nav id="menu"></nav></div>
+</div>
 <script>
 		// mapboxgl.accessToken =
 		"pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw";
 		  // "pk.eyJ1IjoiaC13YXJyZW4iLCJhIjoiY2tnemJmaG54MDQzNjJ3cnN2Mmg1MmF2cyJ9.AMeyJ2g8BQiBQ2ZyH9OyJw";
 		var map2 = new mapboxgl.Map({
 				container:"map2",
-				   style: //mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q",
-				"mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9",   //style URL
+				   style: "mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q",
+				//mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9",   //style URL
 				center:[-122.4733, 47.255], // starting position as [lng, lat]
 				zoom: 11
 		});
@@ -257,8 +257,8 @@ var toggleableLayerIds=["2017","2018","2019","2020"];
  		for (var i = 0; i< toggleableLayerIds.length; i++){
 	 	var id = toggleableLayerIds[i];
 		var link = document.createElement("a");
-		link.href = //mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q",
-	"//mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9";
+		link.href = "mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q",
+	//mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9";
 		link.clasName = "active";
 		link.textContent = id;
 
@@ -270,7 +270,7 @@ var toggleableLayerIds=["2017","2018","2019","2020"];
 				var visibility = map.getLayoutProperty(clickedLayer,"visibility");
 				if (visibility === "visible") {
 					map.setLayoutProperty(clickedLayer, "visibility", "none");
-					properties.Incidentyear = "";
+					properties.IncidentYe = "";
 				}
 				else {
 					this.className = "active";
@@ -284,32 +284,35 @@ var toggleableLayerIds=["2017","2018","2019","2020"];
  }
 
 	map.on("load", function(){
-		// map.loadImage("smGrnflame.png",
-		// 					function(error,image){
-		// 						if (error) throw error;
-		// 						map.addImage("grnflame", image);
-		map.addSource("Mono2",{
-			"type":"geojson",
-			"url":	"//mapbox://styles/h-warren/ckhwau1g7039u19nz7wqszag9"
 
-		});
+		// map.addSource("Mono2",{
+		// 	"id":"2017",
+		// 	"source":{
+		// 		"type":"vector",
+		// 		"url":"mapbox://styles/h-warren/ckhp5h0030eql19piink2ez7q"
+		// 	},
+		// 	"sourcelayer":"h-warren.419qe1k6"
+		// });
 
 	map.addLayer({
 	 		"id":"2017",
-	 		"type":"circle",
-			"source":"composite",
+	 		"type":"vector",
+			"source":{
+				"type":"vector",
+				"url":
+			},
 			"source-layer":"TacFire-5qm3nd",
+			"type":"circle",
 			"layout": {
 				"visibility":"visible",
 			},
 					"paint": {
 							"circle-color":[
-								"case",
+								"match",
 								["get","IncidentYe"],
-								2017,
+								"2017",
 								"green",
 								"black"
-
 							],
 							"circle-radius":4,
 							"circle-blur":.7
@@ -319,7 +322,7 @@ var toggleableLayerIds=["2017","2018","2019","2020"];
 
 		});
 		});
-
+ */
 
 //});
 	// 				"visibility":"visible"
